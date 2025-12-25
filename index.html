@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圣诞快乐 | 圣诞老人的雪橇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            /* 新增：背景图片 + 渐变叠加，营造氛围 */
+            background: 
+                linear-gradient(rgba(0, 0, 34, 0.8), rgba(0, 0, 68, 0.9)),
+                url('https://s41.ax1x.com/2025/12/25/pZJCn6f.jpg') center/cover no-repeat;
+            font-family: "Inter", "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+        }
+
+        /* 雪花容器 */
+        .snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+        }
+
+        /* 雪花样式 */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: #fff;
+            opacity: 0;
+            font-size: 12px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            animation: snowfall linear infinite;
+        }
+
+        /* 初始按钮 */
+        .enter-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 45px;
+            background: linear-gradient(120deg, #e63946, #d62828);
+            color: white;
+            font-size: 28px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(214, 40, 40, 0.5);
+            transition: all 0.4s ease;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .enter-btn:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+            box-shadow: 0 12px 40px rgba(230, 57, 70, 0.7);
+            background: linear-gradient(120deg, #f77f00, #e63946);
+        }
+
+        /* 雪橇+圣诞老人+驯鹿容器 */
+        .sleigh-wrapper {
+            position: absolute;
+            top: 20%;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            display: none;
+            z-index: 5;
+            transform: translateX(100%); /* 初始在屏幕右侧外 */
+            animation: sleighSlide 3s ease-out forwards;
+        }
+
+        /* 驯鹿样式 */
+        .reindeer {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 100px;
+            z-index: 2;
+        }
+
+        /* 驯鹿头部 */
+        .reindeer-head {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: #f5e6d3;
+            border-radius: 50%;
+        }
+
+        /* 驯鹿角 */
+        .antler {
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            border: 5px solid #8b4513;
+            border-radius: 50% 0 50% 0;
+            transform: rotate(-15deg);
+        }
+
+        .antler::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            border: 4px solid #8b4513;
+            border-radius: 50% 0 50% 0;
+            transform: rotate(30deg);
+        }
+
+        /* 驯鹿身体 */
+        .reindeer-body {
+            position: absolute;
+            top: 30px;
+            left: 25px;
+            width: 60px;
+            height: 50px;
+            background: #f5e6d3;
+            border-radius: 50% 30% 50% 30%;
+        }
+
+        /* 驯鹿腿（动画跑动） */
+        .reindeer-leg {
+            position: absolute;
+            width: 8px;
+            height: 30px;
+            background: #8b4513;
+            bottom: 0;
+            animation: legMove 0.8s ease-in-out infinite alternate;
+        }
+
+        .leg1 { left: 40px; animation-delay: 0s; }
+        .leg2 { left: 60px; animation-delay: 0.2s; }
+        .leg3 { left: 75px; animation-delay: 0.1s; }
+        .leg4 { left: 90px; animation-delay: 0.3s; }
+
+        /* 驯鹿尾巴 */
+        .reindeer-tail {
+            position: absolute;
+            top: 40px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            background: #8b4513;
+            border-radius: 50%;
+        }
+
+        /* 雪橇样式 */
+        .sleigh {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-40%);
+            width: 180px;
+            height: 80px;
+            z-index: 1;
+        }
+
+        /* 雪橇主体 */
+        .sleigh-body {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            border-radius: 20px 80px 10px 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* 雪橇滑板 */
+        .sleigh-skate {
+            position: absolute;
+            bottom: -10px;
+            left: 10px;
+            width: 90%;
+            height: 10px;
+            background: #654321;
+            border-radius: 5px;
+            transform: rotate(-5deg);
+        }
+
+        .sleigh-skate::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            width: 100%;
+            height: 5px;
+            background: #fff;
+            border-radius: 3px;
+            opacity: 0.8;
+        }
+
+        /* 新增：雪橇上的礼物图片 */
+        .gift-img {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: giftFloat 2s ease-in-out infinite alternate;
+        }
+
+        /* 圣诞老人样式 */
+        .santa {
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            transform: rotate(5deg);
+            animation: santaSway 2s ease-in-out infinite alternate;
+        }
+
+        /* 圣诞老人帽子 */
+        .santa-hat {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            width: 60px;
+            height: 50px;
+        }
+
+        .hat-top {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 40px solid #ff0000;
+        }
+
+        .hat-pompom {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ffffff;
+        }
+
+        .hat-border {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 60px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 5px;
+        }
+
+        /* 圣诞老人头部 */
+        .santa-head {
+            position: absolute;
+            top: 40px;
+            left: 15px;
+            width: 70px;
+            height: 70px;
+            background: #f5e6d3;
+            border-radius: 50%;
+        }
+
+        /* 圣诞老人胡子 */
+        .santa-beard {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 70px;
+            height: 40px;
+            background: #ffffff;
+            border-radius: 0 0 50% 50%;
+        }
+
+        /* 圣诞老人眼睛 */
+        .santa-eye {
+            position: absolute;
+            top: 15px;
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+        }
+
+        .eye-left { left: 15px; }
+        .eye-right { left: 35px; }
+
+        /* 圣诞老人鼻子 */
+        .santa-nose {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 15px;
+            height: 15px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+
+        /* 圣诞老人身体 */
+        .santa-body {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            width: 80px;
+            height: 60px;
+            background: #ff0000;
+            border-radius: 50% 50% 20% 20%;
+        }
+
+        .santa-body::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 80px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 5px;
+        }
+
+        /* 新增：礼物图片浮动动画 */
+        @keyframes giftFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+
+        /* 动画定义 */
+        /* 雪花飘落 */
+        @keyframes snowfall {
+            0% {
+                top: -10px;
+                opacity: 0;
+                transform: translateX(0) rotate(0deg);
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                top: 100vh;
+                opacity: 0;
+                transform: translateX(50px) rotate(360deg);
+            }
+        }
+
+        /* 雪橇滑入 */
+        @keyframes sleighSlide {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-10%); } /* 停在屏幕左侧偏中位置 */
+        }
+
+        /* 驯鹿腿跑动 */
+        @keyframes legMove {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        /* 圣诞老人晃动 */
+        @keyframes santaSway {
+            0% { transform: rotate(3deg); }
+            100% { transform: rotate(8deg); }
+        }
+
+        /* 响应式适配 - 移动端 */
+        @media (max-width: 768px) {
+            .enter-btn { font-size: 22px; padding: 15px 35px; }
+            
+            /* 缩小驯鹿和雪橇 */
+            .reindeer { width: 80px; height: 70px; }
+            .sleigh { width: 120px; height: 60px; }
+            .santa { width: 70px; height: 70px; }
+            .gift-img { width: 35px; height: 35px; } /* 适配移动端礼物图片 */
+            
+            /* 调整位置 */
+            .sleigh-wrapper { top: 30%; }
+            .reindeer { left: 5%; }
+            .sleigh { left: 15%; }
+            
+            /* 雪橇滑入终点调整 */
+            @keyframes sleighSlide {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(-20%); }
+            }
+        }
+
+        @media (max-width: 480px) {
+            .reindeer { width: 60px; height: 50px; }
+            .sleigh { width: 90px; height: 50px; }
+            .santa { width: 50px; height: 50px; }
+            .gift-img { width: 25px; height: 25px; } /* 适配小屏礼物图片 */
+            
+            .sleigh-wrapper { top: 40%; }
+            
+            @keyframes sleighSlide {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(-30%); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 初始进入按钮 -->
+    <button class="enter-btn" id="enterBtn">🎅 迎接圣诞老人 🎅</button>
+
+    <!-- 雪花容器 -->
+    <div class="snow-container" id="snowContainer"></div>
+
+    <!-- 雪橇+圣诞老人+驯鹿容器 -->
+    <div class="sleigh-wrapper" id="sleighWrapper">
+        <!-- 驯鹿 -->
+        <div class="reindeer">
+            <div class="reindeer-head">
+                <div class="antler"></div>
+            </div>
+            <div class="reindeer-body">
+                <div class="reindeer-leg leg1"></div>
+                <div class="reindeer-leg leg2"></div>
+                <div class="reindeer-leg leg3"></div>
+                <div class="reindeer-leg leg4"></div>
+                <div class="reindeer-tail"></div>
+            </div>
+        </div>
+
+        <!-- 雪橇 -->
+        <div class="sleigh">
+            <div class="sleigh-body">
+                <!-- 新增：雪橇上的礼物图片 -->
+                <img src="https://s41.ax1x.com/2025/12/25/pZJC8ts.jpg" class="gift-img" alt="圣诞礼物">
+                
+                <!-- 圣诞老人 -->
+                <div class="santa">
+                    <div class="santa-hat">
+                        <div class="hat-top"></div>
+                        <div class="hat-pompom"></div>
+                        <div class="hat-border"></div>
+                    </div>
+                    <div class="santa-head">
+                        <div class="santa-eye eye-left"></div>
+                        <div class="santa-eye eye-right"></div>
+                        <div class="santa-nose"></div>
+                        <div class="santa-beard"></div>
+                    </div>
+                    <div class="santa-body"></div>
+                </div>
+            </div>
+            <div class="sleigh-skate"></div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const enterBtn = document.getElementById('enterBtn');
+        const snowContainer = document.getElementById('snowContainer');
+        const sleighWrapper = document.getElementById('sleighWrapper');
+
+        // 点击按钮触发效果
+        enterBtn.addEventListener('click', () => {
+            // 隐藏按钮
+            enterBtn.style.opacity = 0;
+            setTimeout(() => {
+                enterBtn.style.display = 'none';
+            }, 400);
+
+            // 显示雪花和雪橇场景
+            snowContainer.style.display = 'block';
+            sleighWrapper.style.display = 'block';
+
+            // 生成雪花
+            createSnowflakes();
+        });
+
+        // 生成随机雪花
+        function createSnowflakes() {
+            // 适配屏幕尺寸的雪花数量
+            const snowCount = window.innerWidth < 768 ? 80 : 150;
+            
+            for (let i = 0; i < snowCount; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                
+                // 随机雪花字符
+                const snowChars = ['❄️', '❅', '❆'];
+                snowflake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+                
+                // 随机样式
+                const size = Math.random() * 10 + 8;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 15 + 10;
+                const delay = Math.random() * 20;
+                const opacity = Math.random() * 0.8 + 0.2;
+
+                // 应用样式
+                snowflake.style.fontSize = `${size}px`;
+                snowflake.style.left = `${left}%`;
+                snowflake.style.animationDuration = `${duration}s`;
+                snowflake.style.animationDelay = `${delay}s`;
+                snowflake.style.opacity = opacity;
+
+                // 添加到容器
+                snowContainer.appendChild(snowflake);
+
+                // 雪花循环补充
+                snowflake.addEventListener('animationend', () => {
+                    snowflake.remove();
+                    setTimeout(() => createSingleSnowflake(), Math.random() * 5000);
+                });
+            }
+        }
+
+        // 生成单个雪花（补充消失的雪花）
+        function createSingleSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            
+            const snowChars = ['❄️', '❅', '❆'];
+            snowflake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+            
+            const size = Math.random() * 10 + 8;
+            const left = Math.random() * 100;
+            const duration = Math.random() * 15 + 10;
+            const delay = 0;
+            const opacity = Math.random() * 0.8 + 0.2;
+
+            snowflake.style.fontSize = `${size}px`;
+            snowflake.style.left = `${left}%`;
+            snowflake.style.animationDuration = `${duration}s`;
+            snowflake.style.animationDelay = `${delay}s`;
+            snowflake.style.opacity = opacity;
+
+            snowContainer.appendChild(snowflake);
+
+            snowflake.addEventListener('animationend', () => {
+                snowflake.remove();
+                setTimeout(() => createSingleSnowflake(), Math.random() * 5000);
+            });
+        }
+
+        // 窗口大小变化适配
+        window.addEventListener('resize', () => {
+            snowContainer.innerHTML = '';
+            if (snowContainer.style.display === 'block') {
+                createSnowflakes();
+            }
+        });
+    </script>
+</body>
+</html>
