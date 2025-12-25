@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击查看圣诞树</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0a23;
+            font-family: "Arial", "Microsoft YaHei", sans-serif;
+        }
+
+        /* 初始链接样式 */
+        .tree-link {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #d63384;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(214, 51, 132, 0.4);
+        }
+
+        .tree-link:hover {
+            background-color: #e94560;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        /* 圣诞树容器 */
+        .christmas-tree {
+            display: none;
+            position: relative;
+            margin-top: 50px;
+        }
+
+        /* 星星 */
+        .star {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 50px solid #ffd700;
+            animation: spin 5s linear infinite;
+        }
+
+        .star::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: -25px;
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid #ffd700;
+        }
+
+        /* 树的层级 */
+        .tree-layer1 {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 120px solid #2e8b57;
+            position: relative;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+        }
+
+        .tree-layer2 {
+            width: 0;
+            height: 0;
+            border-left: 70px solid transparent;
+            border-right: 70px solid transparent;
+            border-bottom: 90px solid #3cb371;
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+        }
+
+        .tree-layer3 {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 60px solid #90ee90;
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+        }
+
+        /* 树干 */
+        .tree-trunk {
+            width: 30px;
+            height: 60px;
+            background-color: #8b4513;
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+        }
+
+        /* 彩灯 */
+        .light {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink 1.5s infinite alternate;
+        }
+
+        .light1 { top: 20px; left: 30%; background-color: #ff0000; animation-delay: 0s; }
+        .light2 { top: 40px; left: 70%; background-color: #00ff00; animation-delay: 0.2s; }
+        .light3 { top: 70px; left: 20%; background-color: #0000ff; animation-delay: 0.4s; }
+        .light4 { top: 90px; left: 80%; background-color: #ff00ff; animation-delay: 0.6s; }
+        .light5 { top: 50px; left: 50%; background-color: #ffff00; animation-delay: 0.8s; }
+
+        /* 礼物盒 */
+        .gift {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            bottom: -70px;
+            border-radius: 3px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+        }
+
+        .gift1 {
+            left: -60px;
+            background-color: #e74c3c;
+        }
+
+        .gift2 {
+            left: 40px;
+            background-color: #3498db;
+        }
+
+        .gift::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 100%;
+            background-color: white;
+        }
+
+        .gift::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 8px;
+            background-color: white;
+        }
+
+        /* 动画效果 */
+        @keyframes spin {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 480px) {
+            .tree-layer1 {
+                border-left: 70px solid transparent;
+                border-right: 70px solid transparent;
+                border-bottom: 90px solid #2e8b57;
+            }
+            .tree-layer2 {
+                border-left: 50px solid transparent;
+                border-right: 50px solid transparent;
+                border-bottom: 70px solid #3cb371;
+            }
+            .tree-layer3 {
+                border-left: 30px solid transparent;
+                border-right: 30px solid transparent;
+                border-bottom: 50px solid #90ee90;
+            }
+            .star {
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-bottom: 40px solid #ffd700;
+            }
+            .star::after {
+                border-left: 20px solid transparent;
+                border-right: 20px solid transparent;
+                border-top: 40px solid #ffd700;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 点击链接 -->
+    <a href="javascript:void(0);" class="tree-link" id="showTree">点击查看圣诞树 🎄</a>
+
+    <!-- 圣诞树容器 -->
+    <div class="christmas-tree" id="christmasTree">
+        <!-- 星星 -->
+        <div class="star"></div>
+        
+        <!-- 树身 -->
+        <div class="tree-layer1">
+            <div class="light light1"></div>
+            <div class="light light2"></div>
+        </div>
+        <div class="tree-layer2">
+            <div class="light light3"></div>
+            <div class="light light4"></div>
+        </div>
+        <div class="tree-layer3">
+            <div class="light light5"></div>
+        </div>
+        
+        <!-- 树干 -->
+        <div class="tree-trunk"></div>
+        
+        <!-- 礼物盒 -->
+        <div class="gift gift1"></div>
+        <div class="gift gift2"></div>
+    </div>
+
+    <script>
+        // 获取元素
+        const showTreeBtn = document.getElementById('showTree');
+        const christmasTree = document.getElementById('christmasTree');
+
+        // 点击链接显示圣诞树
+        showTreeBtn.addEventListener('click', function() {
+            // 隐藏链接
+            showTreeBtn.style.display = 'none';
+            // 显示圣诞树并添加淡入效果
+            christmasTree.style.display = 'block';
+            christmasTree.style.opacity = '0';
+            christmasTree.style.transition = 'opacity 0.8s ease';
+            
+            // 延迟设置透明度实现淡入
+            setTimeout(() => {
+                christmasTree.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
